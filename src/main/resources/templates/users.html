@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>ユーザー一覧画面</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<div class="contents">
+    <h1>ユーザー一覧画面</h1>
+
+    <div id="user-list">
+        <div th:each="user : ${users}" class="user-item">
+            <img th:src="${user.profileImageUrl ?: '/images/gray.jpg'}" width="50px">
+            <span th:text="${user.userName}">ユーザー名</span>
+        </div>
+    </div>
+
+    <button id="load-more" data-offset="10">もっと見る</button>
+</div>
+
+<script>
+    $(function() {
+    // 「もっと見る」ボタンをクリックした時の処理
+    $('#load-more').on('click', function() {
+        const $button = $(this); // jQueryオブジェクトとしてキャッシュ
+        const offset = parseInt($button.attr('data-offset'));
+
+        // jQueryのAjaxリクエスト
+        $.ajax({
+            url: '/users/api/more',
+            type: 'GET',
+            data: { offset: offset }, // クエリパラメータとして送信
+            dataType: 'json'
+        })
+        .done(function(users) {
+            // データが0件だった場合
+            if (users.length === 0) {
+                $button.text("これ以上はいません").prop('disabled', true);
+                return;
+            }
+
+            // 取得したユーザーをリストに追加
+            users.forEach(function(user) {
+                const profileImg = user.profileImageUrl ? user.profileImageUrl : '/images/gray.jpg';
+
+                const userHtml = `
+                    <div class="user-item">
+                        <img src="${profileImg}" width="50">
+                        <span>${user.userName}</span>
+                    </div>
+                `;
+                $('#user-list').append(userHtml);
+            });
+
+            // 次の取得のためにoffsetを更新 (+10)
+            $button.attr('data-offset', offset + 10);
+        })
+        .fail(function() {
+            alert('データの読み込みに失敗しました。');
+        });
+    });
+});
+</script>
+</body>
+</html>

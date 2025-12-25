@@ -5,6 +5,31 @@
     <title>ホーム画面</title>
 </head>
 <body>
-<h1>ホーム画面</h1>
+
+<div class="contents">
+    <h1>ホーム画面</h1>
+
+    <div>
+        <div>#コート</div>
+        <a th:each="post1 : ${coatPost}" th:href="@{/{account}/{id}(account=${post1.accountId}, id=${post1.id})}">
+            <img th:src="${post1.postImageUrl}" alt="投稿画像" style="width: 30px;">
+            <img th:src="${post1.profileImageUrl ?: '/images/gray.jpg'}" alt="ユーザープロフィール画像" style="width: 30px;">
+            <div th:text="${post1.userName}"></div>
+            <img th:src="${post1.imageUrl}" alt="アイテムの画像" style="width: 30px;">
+        </a>
+    </div>
+
+    <div>
+        <div>#ローファー</div>
+        <a th:each="post1 : ${loafersPost}" th:href="@{/{account}/{id}(account=${post1.accountId}, id=${post1.id})}">
+            <img th:src="${post1.postImageUrl}" alt="投稿画像" style="width: 30px;">
+            <img th:src="${post1.profileImageUrl ?: '/images/gray.jpg'}" alt="ユーザープロフィール画像" style="width: 30px;">
+            <div th:text="${post1.userName}"></div>
+            <img th:src="${post1.imageUrl}" alt="アイテムの画像" style="width: 30px;">
+        </a>
+    </div>
+
+</div>
+
 </body>
 </html>

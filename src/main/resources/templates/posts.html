@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>投稿一覧画面</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<div class="contents">
+    <h1>投稿一覧画面</h1>
+
+    <div id="post-list">
+        <a th:each="post : ${postsDtoList}" class="post-item"
+           th:href="@{/{accountId}/{id}(accountId=${post.accountId}, id=${post.id})}">
+            <img th:src="${post.postImageUrl}" width="50px">
+            <div>
+                <img th:src="${post.profileImageUrl ?: '/images/gray.jpg'}" width="20px">
+                <span th:text="${post.userName}">ユーザー名</span>
+            </div>
+        </a>
+    </div>
+
+    <button id="load-more" data-offset="10">もっと見る</button>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#load-more').on('click', function() {
+            const $button = $(this);
+            const offset = parseInt($button.attr('data-offset'));
+            $.ajax({
+            type: "GET",
+            url: "/posts/more",
+            datatype: "json",
+            data: { offset:offset }
+        }).done(function (posts) {
+            //データがなかったとき
+            if (posts.length == 0) {
+                $button.text("これ以上はいません").prop('disabled', true);
+                return;
+            }
+
+            // 取得した投稿をリストに追加
+            posts.forEach(function(post) {
+                const profileImg = post.profileImageUrl ? post.profileImageUrl : '/images/gray.jpg';
+
+                const postHtml = `
+                    <a class="post-item" :href="/${post.accountId}/${post.id}>
+                        <img src="${post.postImageUrl}" width="50px">
+                        <div>
+                            <img src="${profileImg}" width="20px">
+                            <span text="${post.userName}">ユーザー名</span>
+                        </div>
+                    </a>
+                `;
+                $('#post-list').append(postHtml);
+            });
+
+            $button.attr('data-offset', offset + 10);
+        }).fail(function () {
+            alert('データの読み込みに失敗しました。');
+        });
+        });
+
+
+    });
+</script>
+</body>
+</html>

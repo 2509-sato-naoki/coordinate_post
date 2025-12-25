@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.coordinate_post.repository.PostMapper">
+    <select id="findPost" resultType="com.example.coordinate_post.dto.PostDto">
+        SELECT p.id AS id,
+        p.post_image_url AS post_image_url,
+        u.user_name AS user_name,
+        u.profile_image_url AS profile_image_url,
+        u.account_id AS account_id
+        FROM posts p
+        LEFT JOIN users u ON u.id = p.user_id
+        ORDER BY p.created_at DESC
+        LIMIT #{limit} OFFSET #{offset};
+    </select>
+
+    <select id="findById" resultType="com.example.coordinate_post.dto.PostDetailDto">
+        SELECT  p.post_image_url AS post_image_url,
+        i.image_url AS item_image_url,
+        i.brand_name AS brand_name,
+        p.description AS description,
+        COUNT(b.post_id) AS bookmark_count,
+        u.profile_image_url AS profile_image_url,
+        u.user_name AS user_name
+        FROM posts p
+        INNER JOIN users u ON p.user_id = u.id
+        LEFT JOIN items i ON p.id = i.post_id
+        LEFT JOIN bookmark b ON b.post_id = p.id
+        WHERE p.id = #{postId}
+    </select>
+</mapper>
