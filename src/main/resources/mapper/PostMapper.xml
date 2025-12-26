@@ -17,12 +17,14 @@
 
     <select id="findById" resultType="com.example.coordinate_post.dto.PostDetailDto">
         SELECT  p.post_image_url AS post_image_url,
+        p.id AS id,
         i.image_url AS item_image_url,
         i.brand_name AS brand_name,
         p.description AS description,
         COUNT(b.post_id) AS bookmark_count,
         u.profile_image_url AS profile_image_url,
-        u.user_name AS user_name
+        u.user_name AS user_name,
+        u.id AS user_id
         FROM posts p
         INNER JOIN users u ON p.user_id = u.id
         LEFT JOIN items i ON p.id = i.post_id

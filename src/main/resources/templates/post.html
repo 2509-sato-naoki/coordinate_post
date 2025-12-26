@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>投稿詳細画面</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/follow.js}"></script>
 </head>
 <body>
 
@@ -15,18 +16,71 @@
         <img th:src="${postDetailDto.postImageUrl}" alt="" style="width: 60px;">
 
         <!--ブックマーク数-->
+        <div th:text="${postDetailDto.bookmarkCount}" id="bookmark-count"></div>
+        <button type="button" id="bookmark-btn"
+                th:data-post-id="${postDetailDto.id}"
+                th:classappend="${hasBookmarked} ? 'active' : ''">
+            [[${hasBookmarked ? 'ブックマークを解除' : 'ブックマークする'}]]
+        </button>
 
         <!--投稿の説明文-->
-
+        <div th:text="${postDetailDto.description}"></div>
         <!--アイテムの画像-->
-
+        <img th:src="${postDetailDto.itemImageUrl}" alt="" style="width: 30px;">
         <!--アイテムのブランド名-->
-
+        <div th:text="${postDetailDto.brandName}"></div>
         <!--ユーザー画像-->
-
+        <img th:src="${postDetailDto.profileImageUrl ?: '/images/gray.jpg'}" style="width: 20px;">
         <!--ユーザー名-->
+        <div th:text="${postDetailDto.userName}"></div>
 
+        <!--ユーザーのフォローボタン-->
+        <button type="button" id="follow-btn" th:data-follow-id="${postDetailDto.userId}">
+            フォローする
+            <!--フォロー中-->
+        </button>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        $('#bookmark-btn').on('click', function() {
+            const $button = $(this);
+            const postId = parseInt($button.attr('data-post-id'));
+            const isActive = $button.hasClass('active');
+            // クラスの有無で送り先のURLを変える
+            const url = isActive ? "/bookmark/remove" : "/bookmark/add";
+            $.ajax({
+            type: "POST",
+            url: url,
+            data: { postId:postId }
+        }).done(function (response) {
+            //successかどうか確認
+            if (response == 'success') {
+                if (isActive) {
+                    //ここにブックマークを解除する処理を書く
+                    $button.text('ブックマークする');
+                    let bookmarkCount2 = parseInt($('#bookmark-count').text());
+                    $('#bookmark-count').text(bookmarkCount2 - 1);
+                    $button.removeClass('active');
+                } else {
+                    $button.text('ブックマーク解除');
+                    //text() で中身の文字列を取得し、数値に変換
+                    let bookmarkCount = parseInt($('#bookmark-count').text());
+                    //数値をプラスして、HTMLを書き換える
+                    $('#bookmark-count').text(bookmarkCount + 1);
+                    $button.addClass('active');
+                }
+            } else {
+                alert('データの読み込みに失敗しました。');
+                return;
+            }
+        }).fail(function () {
+            alert('データの読み込みに失敗しました。');
+        });
+        });
+    });
+</script>
+
 </body>
 </html>

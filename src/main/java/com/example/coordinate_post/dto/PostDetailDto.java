@@ -6,6 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostDetailDto {
+    //投稿のID
+    private Integer id;
     //投稿の画像
     private String postImageUrl;
 
@@ -26,4 +28,7 @@ public class PostDetailDto {
 
     //ユーザー名
     private String userName;
+
+    //投稿したユーザーのID
+    private Integer userId;
 }
